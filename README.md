@@ -12,6 +12,6 @@ RTCNext Adalah Sebuah Aplikasi Telepon Indonesia. RTCNext Rilis Pada 24 Oktober 
 1. Lewat link
    [Situs Resmi Rtcnext](https://rtcnext.vercel.app)
 2. Download Aplikasi
-   [↓ Sumber Resmi Rtcnext Aplikasi.](rtcnext.apk?raw=true)
+   [↓ Sumber Resmi Rtcnext Aplikasi.](rtcnext.apk)
 
 
