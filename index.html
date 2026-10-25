@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RTCNext</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+/* ===== KONFIGURASI (sudah terisi) ===== */
+window.RTC_CONFIG = {
+  SUPABASE_URL: "https://kcgefqchgeockrdlmjqc.supabase.co",
+  SUPABASE_KEY: "sb_publishable_b-1q_edwuIJIltZWw3t82g_XBtJuacC"
+};
+</script><style>
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+:root{--cd:#13110b;--p:#f5c518;--m:#a39565;--ln:#3a3118;--g:linear-gradient(120deg,#8a6508,#f5c518 35%,#fff1b0 50%,#f5c518 65%,#8a6508)}
+html,body{height:100%;height:100dvh;background:#050505;color:#f7efd2;font:15px 'Space Grotesk',system-ui,sans-serif;overflow:hidden}
+button{font:inherit}i{display:contents}[hidden]{display:none!important}
+#app{position:relative;z-index:1;max-width:480px;height:100%;margin:auto;overflow:hidden;background:radial-gradient(circle at 20% 0,#2b2208,transparent 55%),#050505d9;border-inline:1px solid #2a2310}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));opacity:0;pointer-events:none;transform:translateX(40px) scale(.98);transition:.45s cubic-bezier(.2,.8,.2,1)}
+.scr.on{opacity:1;pointer-events:auto;transform:none}
+svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+input{width:100%;padding:13px 16px;border-radius:14px;border:1px solid var(--ln);background:#0c0b07;color:inherit;font:inherit;outline:0;transition:.25s}
+input::placeholder{color:#6f6542}
+input:focus{border-color:var(--p);box-shadow:0 0 0 3px #f5c51826,0 0 20px #f5c51822}
+.btn{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:0;border-radius:14px;color:#1a1200;font:700 16px 'Space Grotesk',system-ui,sans-serif;background:var(--g);background-size:200%;animation:flow 5s linear infinite;box-shadow:0 4px 24px #f5c51833;cursor:pointer;transition:transform .15s}
+.btn::after{content:'';position:absolute;top:0;left:-60%;width:35%;height:100%;background:linear-gradient(100deg,transparent,#fffbe6aa,transparent);transform:skewX(-20deg);animation:sw 3.2s infinite}
+.gh{background:#1b170b;color:#ecdfaa;border:1px solid var(--ln);animation:none;box-shadow:none}
+.btn svg{width:20px;height:20px}
+.btn:active,.ib:active,.row:active,.rd:active{transform:scale(.92)}
+.ib{width:42px;height:42px;flex:none;border:1px solid var(--ln);border-radius:50%;background:var(--cd);color:var(--p);display:grid;place-items:center;cursor:pointer;transition:.2s}
+.ib:hover{background:var(--p);color:#1a1200;box-shadow:0 0 16px #f5c51866}
+.send{background:var(--g);color:#1a1200;border:0}
+.mt{color:var(--m)}.err{color:#ff7675;min-height:20px}
+a{color:var(--p);cursor:pointer}
+#sw{display:inline-flex;align-items:center;justify-content:center;gap:6px}#sw svg{width:18px;height:18px}
+h1,.ldt{background:var(--g);background-size:200%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 4s linear infinite}
+h1{font-size:34px;letter-spacing:3px}
+#auth{justify-content:center;gap:12px;text-align:center}
+#auth>*{animation:up .6s both}#auth>*:nth-child(n+3){animation-delay:.2s}#auth>h1{animation:up .6s both,flow 4s linear infinite}
+.logo svg.nl{width:30px;height:30px}.big-logo svg.nl{width:104px;height:104px;margin:auto}
+.nl{filter:drop-shadow(0 0 8px #f5c518aa);animation:glow 2.8s ease-in-out infinite}
+.nl path{fill:none;stroke:url(#lg);stroke-width:4;stroke-dasharray:1;animation:draw 2.8s ease-in-out infinite}
+header{display:flex;align-items:center;gap:10px;padding-bottom:12px}
+header b{flex:1;font-size:19px;color:var(--p);letter-spacing:1px}
+.row{display:flex;align-items:center;gap:12px;padding:12px;margin-bottom:8px;background:var(--cd);border:1px solid #2a2310;border-radius:16px;animation:up .4s both;cursor:pointer;transition:.2s}
+.row:hover{border-color:#7a6216;box-shadow:0 0 18px #f5c51822}
+.row span{flex:1}.row .ib{background:#1d1909}
+.av{width:44px;height:44px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#1a1200;background:linear-gradient(135deg,#fff1b0,#f5c518 50%,#8a6508)}
+.sm{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:0;border-radius:20px;background:var(--g);background-size:200%;color:#1a1200;font-weight:700;cursor:pointer;transition:.2s}
+.sm svg{width:16px;height:16px}.sm:disabled{background:#1d1909;color:var(--m);border:1px solid var(--ln)}
+#list,#res{flex:1;overflow:auto}
+#msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:6px;padding:6px 0}
+.m{max-width:78%;padding:8px 12px;border-radius:16px;word-break:break-word;animation:pop .3s}
+.me{align-self:flex-end;background:linear-gradient(135deg,#f5c518,#b8860b);color:#1a1200;border-bottom-right-radius:4px}
+.ot{align-self:flex-start;background:var(--cd);border:1px solid #2e2710;border-bottom-left-radius:4px}
+.m small{display:block;font-size:10px;opacity:.6;text-align:right;margin-top:2px}
+.m img{max-width:100%;border-radius:10px;display:block}
+.stk{background:none!important;border:0!important;padding:0}.stk .st{width:84px;height:84px}
+.bar{display:flex;gap:8px;align-items:center;padding-top:8px}
+#sp{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:0;overflow:hidden;transition:.35s}
+#sp.on{max-height:200px;padding:10px 0}
+#sp button{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:10px;cursor:pointer;transition:.2s}
+#sp button:active{transform:scale(.85)}#sp .st{width:44px;height:44px;margin:auto}
+.st{stroke:none;fill:none}
+.pulse{animation:pulse 1s infinite}.spin{animation:spin 3s linear infinite}.shake{animation:shake .6s infinite}
+.bounce{animation:bounce 1s infinite}.pop{animation:pulse 1.6s infinite}.swing{animation:swing 1.2s ease-in-out infinite}
+#md{position:fixed;inset:0;background:#000c;display:grid;place-items:center;opacity:0;pointer-events:none;transition:.25s;padding:20px;z-index:8}
+#md.on{opacity:1;pointer-events:auto}
+#md>div{background:var(--cd);border:1px solid #7a6216;box-shadow:0 0 40px #f5c51833;border-radius:20px;padding:22px;max-width:360px;transform:scale(.8);transition:.3s cubic-bezier(.3,1.5,.5,1)}
+#md.on>div{transform:none}#md p{margin-bottom:16px;line-height:1.5}
+.two{display:flex;gap:10px}
+#call{align-items:center;justify-content:center;gap:14px;text-align:center;background:radial-gradient(circle,#2e2308,#050505d9)}
+.big{position:relative;width:110px;height:110px;font-size:44px}
+.big::before,.big::after{content:'';position:absolute;inset:0;border-radius:50%;border:2px solid var(--p);animation:ring 2s infinite}
+.big::after{animation-delay:1s}
+.acts{display:flex;gap:26px;margin-top:30px}
+.rd{width:64px;height:64px;border-radius:50%;border:0;color:#fff;display:grid;place-items:center;cursor:pointer;transition:.2s}
+.gr{background:#2ecc71;animation:shake .8s infinite}.rr{background:#ff4757}.rr svg{transform:rotate(135deg)}
+.mu{background:#1d1909;border:1px solid var(--ln);color:var(--p)}.mu.off{background:#ff4757;color:#fff}
+#call:not(.in) #acc,#call:not(.in) #rej{display:none}#call.in #mut,#call.in #hup,#call.in #inv{display:none}
+#ts{position:fixed;top:14px;left:50%;transform:translate(-50%,-90px);background:var(--g);color:#1a1200;font-weight:700;padding:10px 18px;border-radius:30px;transition:.4s;z-index:9}
+#ts.on{transform:translate(-50%,0)}
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#bg svg{position:absolute;width:90px;height:210px;fill:url(#lg);stroke:none;opacity:0;filter:drop-shadow(0 0 14px #f5c518);animation:fl 7s infinite}
+#bg svg:nth-child(1){left:6%;top:8%;animation-delay:1s}
+#bg svg:nth-child(2){right:7%;top:38%;width:70px;height:160px;animation-duration:9s;animation-delay:3s}
+#bg svg:nth-child(3){left:42%;bottom:4%;width:60px;height:140px;animation-duration:11s;animation-delay:5s}
+#bg::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,#f5c51833,transparent 60%);opacity:0;animation:fl 8s infinite 2s}
+#ld{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:radial-gradient(circle,#2a2008,#050505 70%);transition:opacity .6s,visibility .6s}
+#ld.off{opacity:0;visibility:hidden}
+.ldt{font-size:28px;font-weight:700;letter-spacing:6px}
+.pb{width:min(300px,76vw);height:10px;border-radius:10px;background:#15120a;border:1px solid var(--ln);position:relative;margin-top:8px}
+#pf{position:relative;height:100%;width:0;border-radius:10px;background:var(--g);background-size:200%;animation:flow 2s linear infinite;box-shadow:0 0 14px var(--p)}
+#pf::after{content:'';position:absolute;right:-7px;top:-9px;width:15px;height:26px;background:#fff6c4;clip-path:polygon(60% 0,0 55%,45% 55%,30% 100%,100% 40%,55% 40%);filter:drop-shadow(0 0 6px #ffd54a);animation:fl2 .4s infinite alternate}
+.pi{width:min(300px,76vw);display:flex;justify-content:space-between;align-items:center;color:var(--m);font-size:13px}
+#pp{color:var(--p);font-weight:700;font-size:18px}
+#rt{width:min(300px,76vw)}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tabs button{flex:1;display:flex;gap:6px;align-items:center;justify-content:center;padding:10px;border-radius:12px;border:1px solid var(--ln);background:var(--cd);color:var(--m);cursor:pointer;transition:.25s}
+.tabs .on{background:var(--g);background-size:200%;color:#1a1200;font-weight:700;border-color:transparent}.tabs svg{width:18px;height:18px}
+.bd{background:#ff4757;color:#fff;border-radius:10px;padding:0 6px;font-size:11px}
+.row .ck{flex:none;opacity:0;color:var(--p);transition:.2s}.row.sel{border-color:var(--p);box-shadow:0 0 18px #f5c51833}.sel .ck{opacity:1}
+.loc{width:250px;max-width:85%}.m iframe{width:100%;height:150px;border:0;border-radius:10px;display:block}
+.ml{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:13px;color:inherit}.ml svg{width:16px;height:16px}
+.sn{display:block;font-size:11px;color:var(--p);font-weight:700;margin-bottom:2px}
+#pl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:92%}
+.chip{padding:6px 12px;border-radius:20px;border:1px solid var(--ln);background:#1d1909;font-size:13px;color:var(--m)}.chip.on{color:var(--p);border-color:#7a6216}
+#pn{max-width:92%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bw{position:relative}.bw .bd{position:absolute;top:-5px;right:-5px}
+#gear svg{animation:spin 8s linear infinite}#gear:hover svg{animation-duration:1.5s}
+#bn.has{box-shadow:0 0 16px #f5c51877}#bn.has svg{animation:swing .9s ease-in-out infinite}
+.lb{margin:14px 0 6px}input[type=range]{padding:0;height:28px;border:0;background:none;accent-color:#f5c518}
+.row>svg:last-child{flex:none;color:var(--m)}
+.ncard{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;text-align:center}
+#ndd{line-height:1.6;padding:16px;border:1px solid #7a6216;border-radius:16px;background:var(--cd);animation:up .5s both}
+.three{display:flex;flex-direction:column;gap:10px}
+.pb2{height:6px;border-radius:6px;background:#15120a;overflow:hidden}
+#nbar{height:100%;width:0;background:var(--g);background-size:200%;animation:flow 2s linear infinite;transition:width 1s linear}
+.btn:disabled{opacity:.35;filter:grayscale(.6);pointer-events:none;animation:none}
+@keyframes flow{to{background-position:200%}}
+@keyframes sw{0%,55%{left:-60%}100%{left:130%}}
+@keyframes draw{0%{stroke-dashoffset:1}45%,70%{stroke-dashoffset:0}100%{stroke-dashoffset:-1}}
+@keyframes glow{50%{filter:drop-shadow(0 0 18px #ffe066) brightness(1.4)}}
+@keyframes fl{0%,90%,100%{opacity:0}91%{opacity:.9}92%{opacity:.15}93%{opacity:1}95%{opacity:.3}96%{opacity:.8}98%{opacity:0}}
+@keyframes fl2{to{opacity:.55;transform:scale(1.15)}}
+@keyframes up{from{opacity:0;transform:translateY(16px)}}
+@keyframes pop{from{opacity:0;transform:scale(.7)}}
+@keyframes ring{to{transform:scale(1.9);opacity:0}}
+@keyframes pulse{50%{transform:scale(1.2)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shake{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+@keyframes bounce{50%{transform:translateY(-6px)}}
+@keyframes swing{50%{transform:rotate(14deg)}}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1b0"/><stop offset=".5" stop-color="#f5c518"/><stop offset="1" stop-color="#b8860b"/></linearGradient></defs></svg>
+<div id="bg"><svg viewBox="0 0 60 140"><path d="M38 0 6 78h22L16 140 54 54H32z"/></svg><svg viewBox="0 0 60 140"><path d="M38 0 6 78h22L16 140 54 54H32z"/></svg><svg viewBox="0 0 60 140"><path d="M38 0 6 78h22L16 140 54 54H32z"/></svg></div>
+<div id="ld"><div class="logo big-logo"></div><b class="ldt">RTCNEXT</b><div class="pb"><div id="pf"></div></div><div class="pi"><span id="pt">Menyiapkan...</span><span id="pp">0%</span></div><button id="rt" class="btn" hidden><i data-i="retry"></i>Coba lagi</button></div>
+<div id="app">
+ <section id="auth" class="scr on">
+  <div class="logo big-logo"></div>
+  <h1>RTCNext</h1><p class="mt">Telepon dan chat langsung dari browser</p>
+  <input id="un" placeholder="Nama" autocomplete="username">
+  <input id="pw" type="password" placeholder="Sandi" autocomplete="current-password">
+  <button id="go" class="btn"><i data-i="login"></i><span>Masuk</span></button>
+  <a id="sw"><i data-i="userplus"></i><span>Belum punya akun? Daftar</span></a>
+  <p id="err" class="err"></p>
+ </section>
+ <section id="home" class="scr">
+  <header><span class="logo"></span><b>RTCNext</b><span class="bw"><button id="bn" class="ib" data-i="bell"></button><span id="nb" class="bd" hidden></span></span><button id="gear" class="ib" data-i="gear"></button><button id="addBtn" class="ib" data-i="plus"></button></header>
+  <div class="tabs"><button id="tk" class="on"><i data-i="user"></i>Kontak</button><button id="tg"><i data-i="users"></i>Grup<span id="gb" class="bd" hidden></span></button></div><div id="list"></div>
+ </section>
+ <section id="add" class="scr">
+  <header><button class="ib bk" data-i="back"></button><input id="q" placeholder="Cari nama akun..."></header>
+  <div id="res"></div>
+ </section>
+ <section id="chat" class="scr">
+  <header><button class="ib bk" data-i="back"></button><div class="av" id="cav"></div><b id="cn"></b><button id="ca" class="ib" data-i="userplus" hidden></button><button id="cc" class="ib" data-i="phone"></button></header>
+  <div id="msgs"></div>
+  <div id="sp"></div>
+  <div class="bar"><button id="bi" class="ib" data-i="img"></button><button id="bl" class="ib" data-i="pin"></button><button id="bs" class="ib" data-i="face"></button><input id="mi" placeholder="Tulis pesan"><button id="bz" class="ib send" data-i="send"></button></div>
+  <input id="fi" type="file" accept="image/*" hidden>
+ </section>
+ <section id="st" class="scr">
+  <header><button id="stb" class="ib" data-i="back"></button><b>Pengaturan</b></header>
+  <div class="row" id="mc"><div class="av"><i data-i="phone"></i></div><span>Panggilan<br><small class="mt">Nada dering dan volume</small></span><i data-i="chev"></i></div>
+  <div class="row" id="outBtn"><div class="av"><i data-i="out"></i></div><span>Keluar</span></div>
+ </section>
+ <section id="sc" class="scr">
+  <header><button id="scb" class="ib" data-i="back"></button><b>Panggilan</b></header>
+  <p class="mt lb">Nada dering</p><div id="rtl"></div>
+  <p class="mt lb">Volume nada dering <b id="rvv"></b></p><input id="rv" type="range" min="0" max="100">
+  <p class="mt lb">Volume suara panggilan <b id="cvv"></b></p><input id="cv" type="range" min="0" max="100">
+  <p id="tn" class="mt lb"></p>
+ </section>
+ <section id="nt" class="scr">
+  <header><button id="ntb" class="ib" data-i="back"></button><b>Notifikasi</b></header><div id="nl"></div>
+ </section>
+ <section id="nd" class="scr">
+  <header><button id="ndb" class="ib" data-i="back"></button><b>Kontak Baru</b></header>
+  <div class="ncard"><div class="av" style="width:72px;height:72px;margin:auto"><i data-i="shield"></i></div><p id="ndd"></p>
+   <div class="pb2"><div id="nbar"></div></div><p id="ncd" class="mt"></p>
+   <div class="three"><button id="nbk" class="btn gh"><i data-i="shield"></i><span>Blokir</span></button><button id="nbt" class="btn gh"><i data-i="x"></i><span>Batal</span></button><button id="nok" class="btn"><i data-i="check"></i><span>Terima</span></button></div></div>
+ </section>
+ <section id="pk" class="scr">
+  <header><button id="pkb" class="ib" data-i="back"></button><b id="pkt"></b></header>
+  <input id="gn" maxlength="40" placeholder="Nama grup" hidden><div id="pkl"></div>
+  <button id="pkgo" class="btn"><i data-i="check"></i><span>Lanjut</span></button>
+ </section>
+ <section id="call" class="scr">
+  <div class="av big" id="pav"></div><h2 id="pn"></h2><p id="ps" class="mt"></p><div id="pl"></div>
+  <div class="acts">
+   <button id="acc" class="rd gr" data-i="phone"></button><button id="rej" class="rd rr" data-i="phone"></button>
+   <button id="mut" class="rd mu" data-i="mic"></button><button id="inv" class="rd mu" data-i="userplus"></button><button id="hup" class="rd rr" data-i="phone"></button>
+  </div>
+ </section>
+</div>
+<div id="md"><div><p id="mt"></p><div class="two"><button id="no" class="btn gh"><i data-i="x"></i><span>Batal</span></button><button id="yes" class="btn"><i data-i="check"></i><span>Konfirmasi</span></button></div></div></div>
+<div id="ts"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.106.1"></script>
+<script>
+const C=window.RTC_CONFIG,$=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+let sb;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const P={phone:'M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z',
+send:'M22 2 11 13M22 2l-7 20-4-9-9-4z',img:'M3 3h18v18H3zM8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M21 15l-5-5L5 21',
+plus:'M12 5v14M5 12h14',back:'M15 18l-6-6 6-6',mic:'M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zM19 10v2a7 7 0 0 1-14 0v-2M12 19v3',
+face:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01',out:'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
+x:'M18 6 6 18M6 6l12 12',check:'M20 6 9 17l-5-5',login:'M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3',
+gear:'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z',bell:'M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0',chev:'M9 18l6-6-6-6',shield:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',music:'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z',mute:'M11 5 6 9H2v6h4l5 4zM23 9l-6 6M17 9l6 6',
+user:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',users:'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8',pin:'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6',
+retry:'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8M3 3v5h5',
+bookmark:'M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z',userplus:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M19 8v6M22 11h-6'};
+const ic=n=>`<svg viewBox="0 0 24 24"><path d="${P[n]}"/></svg>`;
+const LOGO='<svg class="nl" viewBox="0 0 40 40"><path pathLength="1" d="M9 32V8l22 24V8"/></svg>';
+// Stiker: SVG beranimasi (tanpa emoji)
+const S={love:['pulse','<path fill="#ff4d6d" d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z"/>'],
+star:['spin','<path fill="#ffd43b" d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.5 5.8 21l1.4-7L2 9.300l7-.8z"/>'],
+bolt:['shake','<path fill="#fcc419" d="M13 2 4 14h7l-1 8 9-12h-7z"/>'],
+smile:['bounce','<circle cx="12" cy="12" r="10" fill="#ffd43b"/><circle cx="8.500" cy="10" r="1.300" fill="#333"/><circle cx="15.500" cy="10" r="1.300" fill="#333"/><path d="M7.500 14c1 3 8 3 9 0" stroke="#333" stroke-width="1.600" stroke-linecap="round"/>'],
+fire:['shake','<path fill="#ff922b" d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-4 3-7 1 1 1.500 2 1.500 3 1.500-2 1.500-5 1.500-8z"/>'],
+ok:['pop','<circle cx="12" cy="12" r="10" fill="#40c057"/><path d="M7 12.500l3.500 3.500L17 9" stroke="#fff" stroke-width="2.500" stroke-linecap="round" stroke-linejoin="round"/>'],
+crown:['bounce','<path fill="#fab005" d="M3 18 2 7l5 4 5-7 5 7 5-4-1 11z"/>'],
+note:['swing','<path fill="#4dabf7" d="M9 3v12.500A3.500 3.500 0 1 0 11 19V8l8-2v7.500A3.500 3.500 0 1 0 21 17V3z"/>']};
+const stk=k=>`<svg class="st ${S[k][0]}" viewBox="0 0 24 24">${S[k][1]}</svg>`;
+$$('[data-i]').forEach(e=>e.innerHTML=ic(e.dataset.i));
+$$('.logo').forEach(e=>e.innerHTML=LOGO);
+$('#sp').innerHTML=Object.keys(S).map(k=>`<button data-k="${k}">${stk(k)}</button>`).join('');
+const show=id=>$$('.scr').forEach(s=>s.classList.toggle('on',s.id==id));
+const toast=t=>{const e=$('#ts');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2800)};
+const ask=(t,y='Konfirmasi',n='Batal')=>new Promise(r=>{$('#mt').textContent=t;$('#yes span').textContent=y;$('#no span').textContent=n;$('#md').classList.add('on');
+ const f=v=>{$('#md').classList.remove('on');r(v)};$('#yes').onclick=()=>f(1);$('#no').onclick=()=>f(0)});
+
+// ===== Auth =====
+let me,ct=[],cur,reg=false;
+$('#sw').onclick=()=>{reg=!reg;$('#go span').textContent=reg?'Daftar':'Masuk';$('#go i').innerHTML=ic(reg?'userplus':'login');$('#sw span').textContent=reg?'Sudah punya akun? Masuk':'Belum punya akun? Daftar';$('#sw i').innerHTML=ic(reg?'login':'userplus')};
+$('#go').onclick=async()=>{
+ const n=$('#un').value.trim().toLowerCase(),p=$('#pw').value,E=$('#err');E.textContent='';
+ if(!/^[a-z0-9_]{3,20}$/.test(n))return E.textContent='Nama 3-20 karakter: huruf kecil, angka, _';
+ if(!p)return E.textContent='Isi sandi';
+ if(reg&&(p.length<8||!/[a-z]/i.test(p)||!/\d/.test(p)))return E.textContent='Sandi minimal 8 karakter, kombinasi huruf dan angka';
+ if(reg&&(/^(12345678|123456789|password|password1|qwerty123|abcd1234|admin123|11111111)$/i.test(p)||p.toLowerCase().includes(n)))return E.textContent='Sandi terlalu mudah ditebak';
+ const e=n+'@rtcnext.app';
+ const r=reg?await sb.auth.signUp({email:e,password:p,options:{data:{name:n}}}):await sb.auth.signInWithPassword({email:e,password:p});
+ const dup=reg&&((r.error&&/already|registered|exists|duplicate/i.test(r.error.message))||(r.data&&r.data.user&&r.data.user.identities&&!r.data.user.identities.length));
+ if(dup)return E.textContent='Nama sudah dipakai orang lain. Pilih nama lain.';
+ if(r.error)return E.textContent=r.error.message.includes('Invalid login')?'Nama atau sandi salah':r.error.message;
+ if(!r.data.session)return E.textContent='Matikan "Confirm email" di Supabase (lihat tutorial)';
+ start(r.data.user);
+};
+$('#outBtn').onclick=async()=>{await sb.auth.signOut();location.reload()};
+
+async function start(u){
+ me={id:u.id,name:u.user_metadata.name};show('home');await Promise.all([loadC(),loadG(),loadN(),loadB()]);iceT=0;ice();
+ sb.channel('msg').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},({new:m})=>{
+  if(m.sender_id==me.id)return;
+  if(cur&&(m.group_id?cur.group&&cur.id==m.group_id:!cur.group&&cur.id==m.sender_id))return bub(m);
+  const n=m.group_id?(gs.find(g=>g.id==m.group_id)||{}).name:(ct.find(x=>x.id==m.sender_id)||{}).name;toast('Pesan baru dari '+(n||'akun lain'))})
+ .on('postgres_changes',{event:'INSERT',schema:'public',table:'group_members',filter:'user_id=eq.'+me.id},async()=>{await loadG()})
+ .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifs',filter:'user_id=eq.'+me.id},async({new:x})=>{await loadN();toast(x.kind=='contact_add'?x.from_name+' menambahkan kamu sebagai kontak':'Undangan grup baru')}).subscribe();
+ sb.channel('in:'+me.id).on('broadcast',{event:'s'},({payload})=>onSig(payload)).subscribe();
+}
+
+// ===== Kontak =====
+let tab='k',gs=[],inv=[];
+async function loadC(){const{data}=await sb.from('contacts').select('contact_id,contact_name').eq('owner',me.id).order('contact_name');
+ ct=(data||[]).map(x=>({id:x.contact_id,name:x.contact_name}));drawHome()}
+async function loadG(){const{data}=await sb.from('group_members').select('status,groups(id,name,owner,owner_name)').eq('user_id',me.id);
+ gs=[];inv=[];(data||[]).forEach(x=>x.groups&&(x.status=='joined'?gs:inv).push(x.groups));drawHome()}
+const rowEl=(i,html)=>{const r=document.createElement('div');r.className='row';r.style.animationDelay=i*60+'ms';r.innerHTML=html;return r};
+function drawHome(){const l=$('#list');l.innerHTML='';$('#tk').classList.toggle('on',tab=='k');$('#tg').classList.toggle('on',tab=='g');
+ $('#gb').hidden=!inv.length;$('#gb').textContent=inv.length;
+ if(tab=='k'){if(!ct.length)l.innerHTML='<p class="mt">Belum ada kontak. Tekan tombol tambah untuk mencari akun.</p>';
+  ct.forEach((c,i)=>{const r=rowEl(i,`<div class="av">${esc(c.name[0].toUpperCase())}</div><span>${esc(c.name)}</span><button class="ib">${ic('phone')}</button>`);
+   r.onclick=e=>e.target.closest('button')?dial(c):openChat(c);l.append(r)});return}
+ if(!gs.length&&!inv.length)l.innerHTML='<p class="mt">Belum ada grup. Tekan tombol tambah untuk membuat grup.</p>';
+ inv.forEach((g,i)=>{const r=rowEl(i,`<div class="av">${ic('users')}</div><span>${esc(g.name)}<br><small class="mt">Undangan dari ${esc(g.owner_name||'?')}</small></span><button class="ib ok">${ic('check')}</button><button class="ib no">${ic('x')}</button>`);
+  r.querySelector('.ok').onclick=async()=>{const{error}=await sb.from('group_members').update({status:'joined'}).eq('group_id',g.id).eq('user_id',me.id);error?toast('Gagal bergabung'):(await loadG(),toast('Bergabung ke '+g.name))};
+  r.querySelector('.no').onclick=async()=>{await sb.from('group_members').delete().eq('group_id',g.id).eq('user_id',me.id);loadG()};l.append(r)});
+ gs.forEach((g,i)=>{const r=rowEl(i,`<div class="av">${ic('users')}</div><span>${esc(g.name)}</span><button class="ib">${ic('phone')}</button>`);
+  r.onclick=e=>e.target.closest('button')?gcall(g):openChat({id:g.id,name:g.name,group:true,owner:g.owner});l.append(r)})}
+function pick(title,cands,max,btn,cb,back,named){
+ $('#pkt').textContent=title;$('#gn').hidden=!named;$('#gn').value='';$('#pkgo span').textContent=btn;
+ const L=$('#pkl'),sel=new Set();L.innerHTML=cands.length?'':'<p class="mt">Tidak ada kontak yang bisa dipilih</p>';
+ cands.forEach((c,i)=>{const r=rowEl(i,`<div class="av">${esc(c.name[0].toUpperCase())}</div><span>${esc(c.name)}</span><span class="ck">${ic('check')}</span>`);
+  r.onclick=()=>{if(sel.has(c.id))sel.delete(c.id);else if(sel.size>=max)return toast('Maksimal '+max+' orang');else sel.add(c.id);r.classList.toggle('sel',sel.has(c.id))};L.append(r)});
+ $('#pkgo').onclick=()=>{const n=$('#gn').value.trim();if(named&&!n)return toast('Isi nama grup');if(!sel.size)return toast('Pilih minimal 1 kontak');cb(cands.filter(c=>sel.has(c.id)),n)};
+ $('#pkb').onclick=()=>show(back);show('pk')}
+async function mkGroup(sel,name){
+ const{data:g,error}=await sb.from('groups').insert({name,owner_name:me.name}).select().single();if(error)return toast('Gagal membuat grup');
+ const{error:e2}=await sb.from('group_members').insert([{group_id:g.id,user_id:me.id,name:me.name,status:'joined'},...sel.map(c=>({group_id:g.id,user_id:c.id,name:c.name,status:'invited'}))]);
+ if(e2)return toast('Gagal mengundang anggota');await loadG();tab='g';drawHome();show('home');toast('Grup dibuat, undangan terkirim')}
+async function addM(sel){const{error}=await sb.from('group_members').insert(sel.map(c=>({group_id:cur.id,user_id:c.id,name:c.name,status:'invited'})));
+ if(error)return toast('Gagal mengundang');cur.mem=(cur.mem||[]).concat(sel.map(c=>({user_id:c.id,name:c.name,status:'invited'})));show('chat');toast('Undangan terkirim')}
+$('#tk').onclick=()=>{tab='k';drawHome()};$('#tg').onclick=()=>{tab='g';drawHome()};
+$('#addBtn').onclick=()=>{if(tab=='g')return pick('Grup baru',ct,50,'Buat grup',mkGroup,'home',true);$('#q').value='';$('#res').innerHTML='';show('add')};
+$$('.bk').forEach(b=>b.onclick=()=>{cur=null;$('#sp').classList.remove('on');show(b.closest('#add')?'home':'home')});
+let tq;$('#q').oninput=()=>{clearTimeout(tq);tq=setTimeout(async()=>{
+ const q=$('#q').value.trim(),R=$('#res');if(!q)return R.innerHTML='';
+ const{data}=await sb.from('profiles').select('id,name').ilike('name','%'+q+'%').neq('id',me.id).limit(15);
+ R.innerHTML=(data||[]).length?'':'<p class="mt">Akun tidak ditemukan</p>';
+ (data||[]).forEach((u,i)=>{const has=ct.some(c=>c.id==u.id),r=document.createElement('div');r.className='row';r.style.animationDelay=i*50+'ms';
+  r.innerHTML=`<div class="av">${esc(u.name[0].toUpperCase())}</div><span>${esc(u.name)}</span><button class="sm" ${has?'disabled':''}>${has?ic('bookmark')+'Tersimpan':ic('userplus')+'Tambahkan'}</button>`;
+  r.querySelector('button').onclick=async e=>{const b=e.currentTarget;
+   if(!await ask('Yakin Dengan Kontak ini Kontak Bisa aja Tidak dikenal Jika mengerti resiko nya Tekan konfirmasi'))return;
+   const{error}=await sb.from('contacts').insert({owner:me.id,contact_id:u.id,contact_name:u.name});
+   if(error)return toast('Gagal menyimpan kontak');
+   b.disabled=true;b.innerHTML=ic('bookmark')+'Tersimpan';await loadC();toast('Kontak ditambahkan')};
+  R.append(r)})},300)};
+
+// ===== Chat =====
+async function openChat(c){cur=c;$('#cn').textContent=c.name;$('#cav').innerHTML=c.group?ic('users'):esc(c.name[0].toUpperCase());$('#ca').hidden=!(c.group&&c.owner==me.id);$('#msgs').innerHTML='';show('chat');
+ let q=sb.from('messages').select('*');
+ q=c.group?q.eq('group_id',c.id):q.or(`and(sender_id.eq.${me.id},receiver_id.eq.${c.id}),and(sender_id.eq.${c.id},receiver_id.eq.${me.id})`);
+ if(c.group){const{data:mm}=await sb.from('group_members').select('user_id,name,status').eq('group_id',c.id);c.mem=mm||[]}
+ const{data}=await q.order('created_at',{ascending:false}).limit(100);
+ if(cur===c)(data||[]).reverse().forEach(bub)}
+function bub(m){const d=document.createElement('div'),own=m.sender_id==me.id;d.className='m '+(own?'me':'ot')+(m.kind=='sticker'?' stk':'')+(m.kind=='location'?' loc':'');
+ if(cur&&cur.group&&!own&&m.sname){const s=document.createElement('b');s.className='sn';s.textContent=m.sname;d.append(s)}
+ if(m.kind=='image'){const i=new Image();i.src=m.body;d.append(i)}
+ else if(m.kind=='sticker'&&S[m.body])d.insertAdjacentHTML('beforeend',stk(m.body));
+ else if(m.kind=='location'){const[a,b]=String(m.body).split(',').map(Number);
+  if(Math.abs(a)<=90&&Math.abs(b)<=180){const e=.004;
+   d.insertAdjacentHTML('beforeend',`<iframe loading="lazy" referrerpolicy="no-referrer" src="https://www.openstreetmap.org/export/embed.html?bbox=${b-e}%2C${a-e}%2C${b+e}%2C${a+e}&layer=mapnik&marker=${a}%2C${b}"></iframe><a class="ml" target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat=${a}&mlon=${b}#map=17/${a}/${b}">${ic('pin')}Buka di OpenStreetMap</a>`)}else d.append('Lokasi tidak valid')}
+ else d.append(document.createTextNode(m.body));
+ const t=document.createElement('small');t.textContent=new Date(m.created_at).toLocaleTimeString('id',{hour:'2-digit',minute:'2-digit'});d.append(t);
+ const B=$('#msgs');B.append(d);B.scrollTop=B.scrollHeight}
+async function snd(kind,body){const{data,error}=await sb.from('messages').insert({...(cur.group?{group_id:cur.id}:{receiver_id:cur.id}),kind,body}).select().single();
+ error?toast('Pesan gagal terkirim'):bub(data)}
+$('#bz').onclick=()=>{const v=$('#mi').value.trim();if(v){$('#mi').value='';snd('text',v)}};
+$('#mi').onkeydown=e=>e.key=='Enter'&&$('#bz').click();
+$('#bs').onclick=()=>$('#sp').classList.toggle('on');
+$('#sp').onclick=e=>{const b=e.target.closest('button');if(b){snd('sticker',b.dataset.k);$('#sp').classList.remove('on')}};
+$('#bi').onclick=()=>$('#fi').click();
+$('#fi').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const i=new Image();i.onload=()=>{
+ const k=Math.min(1,720/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;
+ c.getContext('2d').drawImage(i,0,0,c.width,c.height);snd('image',c.toDataURL('image/jpeg',.7))};i.src=URL.createObjectURL(f)};
+$('#cc').onclick=()=>cur.group?gcall(cur):dial(cur);
+$('#ca').onclick=()=>{const m=new Set((cur.mem||[]).map(x=>x.user_id));pick('Tambah anggota',ct.filter(c=>!m.has(c.id)),50,'Undang',addM,'chat')};
+$('#bl').onclick=async()=>{if(!navigator.geolocation)return toast('Perangkat tidak mendukung lokasi');
+ if(!await ask('Kirim lokasi kamu saat ini? Lawan chat akan melihat posisimu di peta.'))return;
+ navigator.geolocation.getCurrentPosition(p=>snd('location',p.coords.latitude.toFixed(5)+','+p.coords.longitude.toFixed(5)),e=>toast(e.code==1?'Izin lokasi ditolak':'Lokasi tidak tersedia'),{enableHighAccuracy:true,timeout:15000})};
+
+// ===== Telepon berganda (WebRTC mesh, maksimal 4 peserta) =====
+const MAX=4;let rm=null,ls,inc=null,tm=0,prev='home',pend={};const out={};
+const dial=c=>callTo([c]);
+function sig(to,type,data={}){
+ out[to]=out[to]||new Promise(r=>{const ch=sb.channel('in:'+to);ch.subscribe(s=>s=='SUBSCRIBED'&&r(ch))});
+ out[to].then(ch=>ch.send({type:'broadcast',event:'s',payload:{type,from:me.id,name:me.name,...data}}))}
+const rsig=(type,data={})=>rm&&rm.ch.send({type:'broadcast',event:'r',payload:{type,from:me.id,name:me.name,...data}});
+const cnt=()=>Object.keys(rm.ps).length+Object.keys(pend).length+1,chk=()=>{if(rm&&!Object.keys(rm.ps).length&&!Object.keys(pend).length)end(1,'Panggilan selesai')};
+function ui(name,st,incoming){if(!$('#call').classList.contains('on'))prev=document.querySelector('.scr.on').id;
+ $('#pn').textContent=name;$('#pav').textContent=name[0].toUpperCase();$('#ps').textContent=st;$('#pl').innerHTML='';$('#call').classList.toggle('in',incoming);show('call')}
+function drawPl(){if(!rm)return;const a=['<span class="chip on">Kamu</span>'],n=[];
+ Object.values(rm.ps).forEach(o=>{n.push(o.name);a.push(`<span class="chip ${o.st=='connected'?'on':''}">${esc(o.name)}</span>`)});
+ Object.values(pend).forEach(o=>{n.push(o.name);a.push(`<span class="chip">${esc(o.name)} memanggil</span>`)});
+ a.push(`<span class="chip">${cnt()}/${MAX}</span>`);$('#pl').innerHTML=a.join('');if(n.length){$('#pn').textContent=n.join(', ');$('#pav').textContent=n[0][0].toUpperCase()}}
+async function enter(room,g){
+ ls=await navigator.mediaDevices.getUserMedia({audio:true});rm={id:room,g,ps:{},qq:{}};
+ const ch=rm.ch=sb.channel('room:'+room);ch.on('broadcast',{event:'r'},({payload})=>onRoom(payload));
+ await new Promise((ok,no)=>ch.subscribe(s=>{if(s=='SUBSCRIBED')ok();if(s=='CHANNEL_ERROR'||s=='TIMED_OUT')no(Error('room'))}))}
+async function callTo(list,g){
+ if(rm||inc)return toast('Sedang dalam panggilan');ui(list[0].name,'Memanggil...',false);
+ try{await enter(crypto.randomUUID(),g)}catch(e){return end(0,'Mikrofon atau koneksi bermasalah')}
+ list.slice(0,MAX-1).forEach(invite);drawPl()}
+function invite(c){if(!rm||cnt()>=MAX)return toast('Maksimal 4 peserta');
+ pend[c.id]={name:c.name,t:setTimeout(()=>{delete pend[c.id];toast(c.name+' tidak menjawab');drawPl();chk()},30000)};
+ sig(c.id,'ring',{room:rm.id,gname:rm.g});drawPl()}
+async function gcall(g){const{data}=await sb.from('group_members').select('user_id,name,status').eq('group_id',g.id);
+ const l=(data||[]).filter(x=>x.status=='joined'&&x.user_id!=me.id).map(x=>({id:x.user_id,name:x.name}));
+ if(!l.length)return toast('Belum ada anggota lain yang bergabung');if(l.length>MAX-1)toast('Maksimal 4 peserta, 3 anggota pertama dihubungi');callTo(l,g.name)}
+async function mkPeer(id,name,off){
+ const pc=new RTCPeerConnection({iceServers:await ice()});if(!rm||!ls){pc.close();return}
+ const au=new Audio(),o=rm.ps[id]={name,pc,au,q:rm.qq[id]||[],st:'connecting'};delete rm.qq[id];au.autoplay=true;au.volume=cfg.cv;
+ ls.getTracks().forEach(t=>pc.addTrack(t,ls));
+ pc.onicecandidate=e=>e.candidate&&rsig('ice',{to:id,c:e.candidate.toJSON()});
+ pc.ontrack=e=>{au.srcObject=e.streams[0];au.play().catch(()=>{})};
+ pc.onconnectionstatechange=()=>{if(!rm||rm.ps[id]!==o)return;o.st=pc.connectionState;if(o.st=='connected')started();if(o.st=='failed')drop(id);drawPl()};
+ if(off){const d=await pc.createOffer();await pc.setLocalDescription(d);rsig('offer',{to:id,sdp:{type:d.type,sdp:d.sdp}})}
+ drawPl();return o}
+const flush=async o=>{for(const c of o.q.splice(0))await o.pc.addIceCandidate(c).catch(()=>{})};
+const started=()=>{if(tm)return;let t=0;tm=setInterval(()=>$('#ps').textContent=String(t/60|0).padStart(2,'0')+':'+String(t++%60).padStart(2,'0'),1000)};
+function drop(id){const o=rm&&rm.ps[id];if(!o)return;o.pc.close();o.au.srcObject=null;delete rm.ps[id];drawPl();chk()}
+async function onRoom(p){
+ if(!rm||p.from==me.id)return;const t=p.type;
+ if(t=='hi'){if(rm.ps[p.from])return;if(Object.keys(rm.ps).length+1>=MAX)return rsig('full',{to:p.from});
+  if(pend[p.from]){clearTimeout(pend[p.from].t);delete pend[p.from]}await mkPeer(p.from,p.name,true)}
+ else if(t=='bye')drop(p.from);
+ else if(p.to!=me.id)return;
+ else if(t=='offer'){const old=rm.ps[p.from];if(old){if(old.pc.signalingState=='have-local-offer'&&me.id>p.from)return;old.pc.close();delete rm.ps[p.from]}
+  const o=await mkPeer(p.from,p.name,false);if(!o)return;
+  await o.pc.setRemoteDescription(p.sdp);await flush(o);const a=await o.pc.createAnswer();await o.pc.setLocalDescription(a);rsig('answer',{to:p.from,sdp:{type:a.type,sdp:a.sdp}})}
+ else if(t=='answer'){const o=rm.ps[p.from];if(o&&o.pc.signalingState=='have-local-offer'){await o.pc.setRemoteDescription(p.sdp);await flush(o)}}
+ else if(t=='ice'){const o=rm.ps[p.from];o&&o.pc.remoteDescription?o.pc.addIceCandidate(p.c).catch(()=>{}):(o?o.q:(rm.qq[p.from]=rm.qq[p.from]||[])).push(p.c)}
+ else if(t=='full')end(0,'Panggilan penuh')}
+function onSig(p){
+ if(p.type=='ring'){if(rm||inc||bl.has(p.from))return sig(p.from,'dec',{room:p.room});inc=p;ui(p.name,p.gname?'Undangan grup '+p.gname:'Panggilan masuk',true);ring(cfg.rt,cfg.rv)}
+ else if(p.type=='cancel'&&inc&&inc.room==p.room){inc=null;end(0,'Panggilan dibatalkan')}
+ else if(p.type=='dec'&&pend[p.from]){clearTimeout(pend[p.from].t);delete pend[p.from];drawPl();chk()}}
+$('#acc').onclick=async()=>{const p=inc;if(!p)return;inc=null;stopRing();$('#call').classList.remove('in');$('#ps').textContent='Menghubungkan...';
+ try{await enter(p.room,p.gname)}catch(e){sig(p.from,'dec',{room:p.room});return end(0,'Mikrofon atau koneksi bermasalah')}
+ rsig('hi');drawPl();const id=rm.id;setTimeout(()=>rm&&rm.id==id&&!Object.keys(rm.ps).length&&end(1,'Panggilan sudah berakhir'),15000)};
+$('#rej').onclick=()=>end(1,'Ditolak');$('#hup').onclick=()=>end(1,'Panggilan selesai');
+$('#mut').onclick=()=>{const t=ls&&ls.getAudioTracks()[0];if(t){t.enabled=!t.enabled;$('#mut').classList.toggle('off',!t.enabled)}};
+$('#inv').onclick=()=>{if(!rm)return;const left=MAX-cnt();if(left<=0)return toast('Maksimal 4 peserta');
+ const busy=new Set([...Object.keys(rm.ps),...Object.keys(pend)]);
+ pick('Undang ke panggilan',ct.filter(c=>!busy.has(c.id)),left,'Undang',sel=>{sel.forEach(invite);show('call')},'call')};
+function end(notify,msg){
+ if(rm){const r=rm;rm=null;if(notify)r.ch.send({type:'broadcast',event:'r',payload:{type:'bye',from:me.id}});
+  Object.values(r.ps).forEach(o=>{o.pc.close();o.au.srcObject=null});
+  Object.entries(pend).forEach(([i,o])=>{clearTimeout(o.t);notify&&sig(i,'cancel',{room:r.id})});pend={};setTimeout(()=>sb.removeChannel(r.ch),300)}
+ else if(inc&&notify)sig(inc.from,'dec',{room:inc.room});
+ stopRing();inc=null;ls&&ls.getTracks().forEach(t=>t.stop());ls=null;clearInterval(tm);tm=0;
+ $('#mut').classList.remove('off');$('#call').classList.remove('in');$('#pl').innerHTML='';$('#ps').textContent=msg;toast(msg);setTimeout(()=>show(prev),900)}
+
+// ===== TURN Metered + pengaturan panggilan =====
+let iceC=null,iceT=0,iceX=0,turnOk=null,cfg={rt:'klasik',rv:.8,cv:1},ac,rtT=0,nf=[],bl=new Set(),ndT=0;
+try{cfg={...cfg,...JSON.parse(localStorage.getItem('rtc_cfg')||'{}')}}catch(e){}
+const save=()=>{try{localStorage.setItem('rtc_cfg',JSON.stringify(cfg))}catch(e){}};
+const STUN=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun2.l.google.com:19302'}];
+async function ice(){if(iceC&&Date.now()-iceT<iceX)return iceC;let s=STUN,ok=false;
+ try{const{data}=await sb.auth.getSession(),t=data.session&&data.session.access_token;
+  if(t){const j=await(await fetch('/api/turn',{headers:{Authorization:'Bearer '+t}})).json();if(Array.isArray(j)&&j.length){s=STUN.concat(j);ok=true}}}catch(e){}
+ turnOk=ok;iceC=s;iceT=Date.now();iceX=ok?6e5:15e3;return s}
+const RT={klasik:{n:'Klasik',p:[[880,.22],[0,.12],[880,.22],[0,.12],[880,.22],[0,1]]},
+ kilat:{n:'Kilat',p:[[1400,.07],[2200,.07],[1000,.07],[2600,.07],[0,.14],[1400,.07],[2200,.07],[1000,.07],[2600,.07],[0,.9]]},
+ lembut:{n:'Lembut',p:[[523,.45],[659,.45],[784,.6],[0,.9]]},senyap:{n:'Senyap',p:null}};
+addEventListener('pointerdown',()=>{ac=ac||new AudioContext();ac.resume()},{once:true});
+function ring(k,vol,once){stopRing();const p=RT[k]&&RT[k].p;if(!p||vol<=0)return;ac=ac||new AudioContext();ac.resume();
+ const go=()=>{let t=ac.currentTime;p.forEach(([f,d])=>{if(f){const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.setValueAtTime(vol*.6,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d)}t+=d});return(t-ac.currentTime)*1000};
+ const len=go();if(!once)rtT=setInterval(go,len)}
+const stopRing=()=>{clearInterval(rtT);rtT=0};
+function drawRT(){const L=$('#rtl');L.innerHTML='';Object.keys(RT).forEach((k,i)=>{
+ const r=rowEl(i,`<div class="av">${ic(k=='senyap'?'mute':'music')}</div><span>${RT[k].n}</span><span class="ck">${ic('check')}</span>`);
+ r.classList.toggle('sel',cfg.rt==k);r.onclick=()=>{cfg.rt=k;save();drawRT();ring(k,cfg.rv,true)};L.append(r)})}
+function sl(id,lab,key,fn){const e=$(id);e.value=Math.round(cfg[key]*100);$(lab).textContent=e.value+'%';
+ e.oninput=()=>{cfg[key]=e.value/100;$(lab).textContent=e.value+'%';save();fn&&fn()}}
+$('#gear').onclick=()=>show('st');$('#stb').onclick=()=>show('home');$('#scb').onclick=()=>{stopRing();show('st')};
+$('#mc').onclick=()=>{drawRT();sl('#rv','#rvv','rv');$('#rv').onchange=()=>ring(cfg.rt,cfg.rv,true);
+ sl('#cv','#cvv','cv',()=>rm&&Object.values(rm.ps).forEach(o=>o.au.volume=cfg.cv));
+ $('#tn').textContent=turnOk?'Server TURN Metered: aktif':'Server TURN Metered: belum aktif. Pastikan METERED_APP, METERED_KEY, SUPABASE_URL, SUPABASE_KEY sudah diisi di Environment Variables Vercel, lalu deploy ulang.';show('sc')};
+// ===== Notifikasi + persetujuan kontak baru =====
+const loadB=async()=>{const{data}=await sb.from('blocks').select('blocked');bl=new Set((data||[]).map(x=>x.blocked))};
+async function loadN(){const{data}=await sb.from('notifs').select('*').order('created_at',{ascending:false}).limit(50);nf=data||[];drawBadge();if($('#nt').classList.contains('on'))drawN()}
+function drawBadge(){const u=nf.filter(n=>!n.read).length;$('#nb').hidden=!u;$('#nb').textContent=u;$('#bn').classList.toggle('has',u>0)}
+function drawN(){const l=$('#nl');l.innerHTML=nf.length?'':'<p class="mt">Belum ada aktivitas</p>';
+ nf.forEach((n,i)=>{const c=n.kind=='contact_add',t=c?`${esc(n.from_name)} menambahkan kamu sebagai kontak`:`${esc(n.from_name)} mengundang kamu ke grup ${esc(n.ref)}`,
+  st={new:c?'Perlu tindakan':'Baru',accepted:'Diterima',cancelled:'Dibatalkan',blocked:'Diblokir'}[n.status],
+  r=rowEl(i,`<div class="av">${ic(c?'userplus':'users')}</div><span>${t}<br><small class="mt">${st} · ${new Date(n.created_at).toLocaleString('id',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</small></span>${ic('chev')}`);
+  r.onclick=()=>openN(n);l.append(r)})}
+$('#bn').onclick=async()=>{drawN();show('nt');if(nf.some(n=>!n.read)){await sb.from('notifs').update({read:true}).eq('user_id',me.id).eq('read',false);nf.forEach(n=>n.read=true);drawBadge()}};
+$('#ntb').onclick=()=>show('home');
+function openN(n){if(n.kind=='group_invite'){tab='g';drawHome();return show('home')}
+ if(n.status!='new')return toast(n.status=='accepted'?'Sudah diterima':n.status=='blocked'?'Sudah diblokir':'Sudah dibatalkan');
+ clearInterval(ndT);$('#ndd').textContent=`Dari ${n.from_name} Telah Menambah Kontak Anda Jika Anda Yakin Ini Kontak Tidak Dikenal Blokir, Atau Batal Jika Kontak Anda Merasa Dikenal Maka Terima. Hati Hati Modus Penipuan!`;
+ const B=[$('#nbk'),$('#nbt'),$('#nok')];let s=10;
+ const set=()=>{B.forEach(b=>b.disabled=s>0);$('#ncd').textContent=s>0?`Tombol aktif dalam ${s} detik`:'Pilih tindakan';$('#nbar').style.width=(10-s)*10+'%'};
+ $('#nbar').style.transition='none';$('#nbar').style.width='0';setTimeout(()=>{$('#nbar').style.transition='';set()},50);
+ ndT=setInterval(()=>{s--;set();if(s<=0)clearInterval(ndT)},1000);
+ const fin=async st=>{clearInterval(ndT);await sb.from('notifs').update({status:st,read:true}).eq('id',n.id);n.status=st;await loadN();show('nt');drawN()};
+ $('#nbk').onclick=async()=>{await sb.from('blocks').insert({blocked:n.from_id});bl.add(n.from_id);toast(n.from_name+' diblokir');fin('blocked')};
+ $('#nbt').onclick=()=>fin('cancelled');
+ $('#nok').onclick=async()=>{if(!await ask('Yakin? Resiko Penipuan Kontak Sangat Tinggi Jika Mengerti Resiko nya tekan tombol tambahkan kontak','Tambahkan Kontak','Tidak'))return fin('cancelled');
+  const{error}=await sb.from('contacts').insert({owner:me.id,contact_id:n.from_id,contact_name:n.from_name});
+  if(error&&error.code!='23505')return toast('Gagal menambahkan kontak');await loadC();toast('Kontak ditambahkan');fin('accepted')};
+ $('#ndb').onclick=()=>{clearInterval(ndT);show('nt')};show('nd')}
+
+// ===== Loader & boot: setiap tahap harus selesai sebelum UI ditampilkan =====
+let pv=0,tg=0;const L=(t,m)=>{tg=t;m&&($('#pt').textContent=m)},wait=ms=>new Promise(r=>setTimeout(r,ms));
+(function tick(){pv+=(tg-pv)*.07;if(tg-pv<.3)pv=tg;$('#pf').style.width=pv+'%';$('#pp').textContent=Math.round(pv)+'%';requestAnimationFrame(tick)})();
+async function boot(){
+ try{
+  L(12,'Memuat font dan tampilan');
+  await Promise.race([document.fonts.load("700 16px 'Space Grotesk'"),wait(3500)]);
+  L(34,'Menyiapkan komponen');await wait(250);
+  if(!window.supabase)throw Error('Pustaka Supabase tidak termuat, periksa internet');
+  const u=String(C.SUPABASE_URL||'').replace(/\/rest\/v1\/?$/,'').replace(/\/$/,'');
+  if(!/^https:\/\/.+\.supabase\.co$/.test(u)||!C.SUPABASE_KEY)throw Error('Konfigurasi Supabase belum benar');
+  sb=supabase.createClient(u,C.SUPABASE_KEY);
+  L(55,'Memeriksa sesi masuk');
+  const{data,error}=await sb.auth.getSession();if(error)throw error;
+  if(data.session){L(66,'Menyiapkan server panggilan');await ice();L(78,'Memuat kontak');await start(data.session.user)}
+  L(92,'Merapikan tampilan');await wait(300);
+  L(100,'Siap');while(pv<100)await wait(40);
+  await wait(250);$('#ld').classList.add('off');
+ }catch(e){L(tg,'Gagal: '+(e.message||e));$('#rt').hidden=false}
+}
+$('#rt').onclick=()=>location.reload();boot();
+</script>
+</body></html>
